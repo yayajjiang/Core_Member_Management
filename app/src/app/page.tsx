@@ -53,7 +53,7 @@ export default async function HomePage() {
   const { data: activities } = groupIds.length > 0
     ? await supabase
         .from('activities')
-        .select('*, profiles(name), rsvps(status, user_id), groups(name)')
+        .select('*')
         .in('group_id', groupIds)
         .neq('status', 'cancelled')
         .order('event_time', { ascending: true })
@@ -106,8 +106,6 @@ export default async function HomePage() {
               )}
             </div>
             {(activities as any[]).map((a) => {
-              const goingCount = (a.rsvps ?? []).filter((r: any) => r.status === 'going').length
-              const myRsvp = (a.rsvps ?? []).find((r: any) => r.user_id === user.id)
               return (
                 <Link key={a.id} href={`/activities/${a.id}`}
                   className="block bg-white rounded-xl border p-4 hover:shadow-sm transition-shadow">
@@ -123,16 +121,7 @@ export default async function HomePage() {
                       <p className="text-sm text-gray-500 mt-1">{formatDate(a.event_time)}</p>
                       {a.location && <p className="text-sm text-gray-400">📍 {a.location}</p>}
                     </div>
-                    <div className="text-right shrink-0">
-                      <p className="text-sm text-gray-600">{goingCount} 人参加</p>
-                      {myRsvp && (
-                        <p className="text-xs text-gray-400 mt-1">
-                          {myRsvp.status === 'going' ? '✅ 去' : myRsvp.status === 'not_going' ? '❌ 不去' : '🤔 待定'}
-                        </p>
-                      )}
-                    </div>
                   </div>
-                  <p className="text-xs text-gray-400 mt-2">{(a.groups as any)?.name}</p>
                 </Link>
               )
             })}
