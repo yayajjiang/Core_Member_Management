@@ -41,10 +41,14 @@ export default async function HomePage() {
 
   const { data: memberships } = await supabase
     .from('group_members')
-    .select('group_id, groups(id, name)')
+    .select('group_id')
     .eq('user_id', user.id)
 
   const groupIds = (memberships ?? []).map((m: any) => m.group_id)
+
+  const { data: groupsData } = groupIds.length > 0
+    ? await supabase.from('groups').select('id, name').in('id', groupIds)
+    : { data: [] }
 
   const { data: activities } = groupIds.length > 0
     ? await supabase
@@ -52,10 +56,10 @@ export default async function HomePage() {
         .select('*, profiles(name), rsvps(status, user_id), groups(name)')
         .in('group_id', groupIds)
         .neq('status', 'cancelled')
-        .order('event_time', { ascending: true })
+        .order('event_time', { ascending: true, nullsFirst: false })
     : { data: [] }
 
-  const groups = (memberships ?? []).map((m: any) => m.groups)
+  const groups = groupsData ?? []
 
   return (
     <div className="min-h-screen">
