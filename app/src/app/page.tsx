@@ -56,7 +56,7 @@ export default async function HomePage() {
         .select('*, profiles(name), rsvps(status, user_id), groups(name)')
         .in('group_id', groupIds)
         .neq('status', 'cancelled')
-        .order('event_time', { ascending: true, nullsFirst: false })
+        .order('event_time', { ascending: true })
     : { data: [] }
 
   const groups = groupsData ?? []
