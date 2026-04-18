@@ -38,6 +38,17 @@ export default function NewGroupPage() {
     }
 
     await supabase.from('group_members').insert({ group_id: group.id, user_id: user.id })
+
+    // create a default welcome activity
+    await supabase.from('activities').insert({
+      group_id: group.id,
+      title: '🎉 第一次活动 — 待定',
+      type: 'dining',
+      status: 'proposed',
+      description: '欢迎来到群组！修改这个活动或创建新的活动开始计划吧。',
+      created_by: user.id,
+    })
+
     router.push(`/groups/${group.id}`)
   }
 
